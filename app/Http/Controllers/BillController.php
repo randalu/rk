@@ -39,77 +39,78 @@ class BillController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'customer_id'              => 'required|exists:customers,id',
-            'salesperson_id'           => 'required|exists:salespeople,id',
-            'payment_type'             => 'required|in:cash,card,online',
-            'payment_term'             => 'required|in:cash,credit_30,credit_45,credit_60',
-            'advance_payment'          => 'nullable|numeric|min:0',
-            'items'                    => 'required|array|min:1',
-            'items.*.inventory_id'     => 'required|exists:inventory,id',
-            'items.*.qty'              => 'required|integer|min:1',
-            'items.*.unit_price'       => 'required|numeric|min:0',
+{
+    $request->validate([
+        'customer_id'              => 'required|exists:customers,id',
+        'salesperson_id'           => 'required|exists:salespeople,id',
+        'payment_type'             => 'required|in:cash,card,online',
+        'payment_term'             => 'required|in:cash,credit_30,credit_45,credit_60',
+        'advance_payment'          => 'nullable|numeric|min:0',
+        'items'                    => 'required|array|min:1',
+        'items.*.inventory_id'     => 'required|exists:inventory,id',
+        'items.*.qty'              => 'required|integer|min:1',
+        'items.*.unit_price'       => 'required|numeric|min:0',
+    ]);
+
+    $bill = null;
+
+    DB::transaction(function () use ($request, &$bill) {
+
+        $dueDate = match($request->payment_term) {
+            'credit_30' => Carbon::today()->addDays(30),
+            'credit_45' => Carbon::today()->addDays(45),
+            'credit_60' => Carbon::today()->addDays(60),
+            default     => Carbon::today(),
+        };
+
+        $total = collect($request->items)
+            ->sum(fn($i) => $i['qty'] * $i['unit_price']);
+
+        $bill = Bill::create([
+            'customer_id'     => $request->customer_id,
+            'salesperson_id'  => $request->salesperson_id,
+            'created_by'      => auth()->id(),
+            'payment_type'    => $request->payment_type,
+            'payment_term'    => $request->payment_term,
+            'due_date'        => $dueDate,
+            'advance_payment' => $request->advance_payment ?? 0,
+            'total'           => $total,
         ]);
 
-        DB::transaction(function () use ($request) {
-            // Fire new bill SMS
-$smsService = new SmsService();
-$bill->load('customer', 'salesperson', 'payments');
-$smsService->newBillSms($bill);
+        foreach ($request->items as $item) {
+            $inventoryItem = Inventory::find($item['inventory_id']);
 
-            // Calculate due date from payment term
-            $dueDate = match($request->payment_term) {
-                'credit_30' => Carbon::today()->addDays(30),
-                'credit_45' => Carbon::today()->addDays(45),
-                'credit_60' => Carbon::today()->addDays(60),
-                default     => Carbon::today(),
-            };
-
-            // Calculate total
-            $total = collect($request->items)
-                ->sum(fn($i) => $i['qty'] * $i['unit_price']);
-
-            $bill = Bill::create([
-                'customer_id'     => $request->customer_id,
-                'salesperson_id'  => $request->salesperson_id,
-                'created_by'      => auth()->id(),
-                'payment_type'    => $request->payment_type,
-                'payment_term'    => $request->payment_term,
-                'due_date'        => $dueDate,
-                'advance_payment' => $request->advance_payment ?? 0,
-                'total'           => $total,
+            $bill->items()->create([
+                'inventory_id' => $item['inventory_id'],
+                'batch_number' => $inventoryItem->batch_number ?? '—',
+                'qty'          => $item['qty'],
+                'unit_price'   => $item['unit_price'],
+                'line_total'   => $item['qty'] * $item['unit_price'],
             ]);
 
-            // Create bill items and deduct inventory (FEFO)
-            foreach ($request->items as $item) {
-                $inventoryItem = Inventory::find($item['inventory_id']);
+            $inventoryItem->decrement('qty', $item['qty']);
 
-                $bill->items()->create([
-                    'inventory_id' => $item['inventory_id'],
-                    'batch_number' => $inventoryItem->batch_number ?? '—',
-                    'qty'          => $item['qty'],
-                    'unit_price'   => $item['unit_price'],
-                    'line_total'   => $item['qty'] * $item['unit_price'],
-                ]);
-
-                // Deduct from inventory
-                $inventoryItem->decrement('qty', $item['qty']);
-            }
             // Check low stock after deduction
-$inventoryItem->refresh();
-if ($inventoryItem->isLowStock()) {
-    $smsService = new SmsService();
-    $smsService->lowStockSms($inventoryItem);
-}
+            $inventoryItem->refresh();
+            if ($inventoryItem->isLowStock()) {
+                $smsService = new SmsService();
+                $smsService->lowStockSms($inventoryItem);
+            }
+        }
 
-            // Create commission record
-            $this->createCommission($bill, $total);
-        });
+        $this->createCommission($bill, $total);
+    });
 
-        return redirect()->route('bills.index')
-                         ->with('success', 'Bill created successfully.');
+    // Fire SMS outside the transaction
+    if ($bill) {
+        $bill->load('customer', 'salesperson', 'payments');
+        $smsService = new SmsService();
+        $smsService->newBillSms($bill);
     }
+
+    return redirect()->route('bills.index')
+                     ->with('success', 'Bill created successfully.');
+}
 
     public function show(Bill $bill)
     {
