@@ -6,8 +6,8 @@ body {
     font-family: 'Segoe UI', sans-serif;
 }
 
+/* ── Sidebar ── */
 .sidebar {
-    min-height: 100vh;
     height: 100vh;
     width: 250px;
     background-color: #1a1f36;
@@ -15,25 +15,16 @@ body {
     top: 0;
     left: 0;
     z-index: 100;
-    transition: all 0.3s;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: #2d3561 #1a1f36;
+    transition: transform 0.3s ease;
 }
 
-.sidebar::-webkit-scrollbar {
-    width: 4px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: #1a1f36;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: #2d3561;
-    border-radius: 4px;
-}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: #1a1f36; }
+.sidebar::-webkit-scrollbar-thumb { background: #2d3561; border-radius: 4px; }
 
 .sidebar .nav-link {
     color: #a0aec0;
@@ -49,25 +40,28 @@ body {
     color: #ffffff;
 }
 
-.sidebar .nav-link i {
-    width: 20px;
-    margin-right: 8px;
-}
+.sidebar .nav-link i { width: 20px; margin-right: 8px; }
 
 .sidebar-brand {
-    padding: 20px;
+    padding: 16px 20px;
     color: #ffffff;
     font-size: 18px;
     font-weight: 600;
     border-bottom: 1px solid #2d3561;
+    position: sticky;
+    top: 0;
+    background: #1a1f36;
+    z-index: 1;
 }
 
+/* ── Main Content ── */
 .main-content {
     margin-left: 250px;
     padding: 24px;
     min-height: 100vh;
 }
 
+/* ── Topbar ── */
 .topbar {
     background: #ffffff;
     padding: 12px 24px;
@@ -78,6 +72,7 @@ body {
     align-items: center;
 }
 
+/* ── Cards ── */
 .card {
     border: none;
     border-radius: 12px;
@@ -98,21 +93,73 @@ body {
     color: white;
 }
 
-.btn-primary {
-    background-color: #4f46e5;
-    border-color: #4f46e5;
+/* ── Buttons ── */
+.btn-primary { background-color: #4f46e5; border-color: #4f46e5; }
+.btn-primary:hover { background-color: #4338ca; border-color: #4338ca; }
+
+/* ── Tables ── */
+.table > :not(caption) > * > * { padding: 12px 16px; }
+.badge { font-weight: 500; padding: 5px 10px; }
+
+/* Make all tables scroll on mobile */
+.table-responsive-always {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.btn-primary:hover {
-    background-color: #4338ca;
-    border-color: #4338ca;
+/* ── Mobile ── */
+@media (max-width: 767px) {
+    .sidebar {
+        transform: translateX(-250px);
+        position: fixed;
+        z-index: 100;
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    .topbar {
+        margin: -16px -16px 16px -16px;
+        padding: 10px 16px;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-card .fs-4 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Stack table cards full width */
+    .card-body.p-0 {
+        overflow-x: auto;
+    }
+
+    /* Hide less important table columns on mobile */
+    .d-mobile-none {
+        display: none !important;
+    }
+
+    .table > :not(caption) > * > * {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    /* Full width forms on mobile */
+    .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8 {
+        margin-bottom: 8px;
+    }
 }
 
-.table > :not(caption) > * > * {
-    padding: 12px 16px;
-}
-
-.badge {
-    font-weight: 500;
-    padding: 5px 10px;
+@media (min-width: 768px) {
+    .sidebar {
+        transform: translateX(0) !important;
+    }
 }
