@@ -23,18 +23,23 @@
         <div class="nav-link text-uppercase" style="font-size:10px;letter-spacing:1px;color:#4a5568;padding-top:16px">
             Sales
         </div>
-        <a href="{{ route('bills.index') }}"
-           class="nav-link {{ request()->routeIs('bills.*') ? 'active' : '' }}">
-            <i class="bi bi-receipt"></i> Bills
-        </a>
+        {{-- Bills --}}
+<a href="{{ route('bills.index') }}"
+   class="nav-link {{ request()->routeIs('bills.*') ? 'active' : '' }}">
+    <i class="bi bi-receipt"></i> Bills
+</a>
         <a href="{{ route('customers.index') }}"
            class="nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
             <i class="bi bi-people"></i> Customers
         </a>
-        <a href="{{ route('returns.index') }}"
-           class="nav-link {{ request()->routeIs('returns.*') ? 'active' : '' }}">
-            <i class="bi bi-arrow-return-left"></i> Returns
-        </a>
+        {{-- Returns --}}
+@if(userCan('approve_return') || userRole() === 'cashier' || userRole() === 'salesman')
+<a href="{{ route('returns.index') }}"
+   class="nav-link {{ request()->routeIs('returns.*') ? 'active' : '' }}">
+    <i class="bi bi-arrow-return-left"></i> Returns
+</a>
+@endif
+
         <a href="{{ route('payments.index') }}"
            class="nav-link {{ request()->routeIs('payments.*') ? 'active' : '' }}">
             <i class="bi bi-cash-stack"></i> Payments
@@ -67,18 +72,61 @@
            class="nav-link {{ request()->routeIs('commissions.*') ? 'active' : '' }}">
             <i class="bi bi-graph-up-arrow"></i> Commissions
         </a>
+    {{-- Under Finance section --}}
+<a href="{{ route('reports.index') }}"
+   class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+    <i class="bi bi-bar-chart"></i> Reports
+</a>
 
+{{-- Under Settings section --}}
+<a href="{{ route('action-log.index') }}"
+   class="nav-link {{ request()->routeIs('action-log.*') ? 'active' : '' }}">
+    <i class="bi bi-clock-history"></i> Action Log
+</a>
         <div class="nav-link text-uppercase" style="font-size:10px;letter-spacing:1px;color:#4a5568;padding-top:16px">
             Settings
         </div>
-        <a href="{{ route('users.index') }}"
-           class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-            <i class="bi bi-person-gear"></i> Users
-        </a>
-        <a href="{{ route('sms-recipients.index') }}"
-           class="nav-link {{ request()->routeIs('sms-recipients.*') ? 'active' : '' }}">
-            <i class="bi bi-phone"></i> SMS Recipients
-        </a>
+        {{-- Users — admin only --}}
+@if(userCan('manage_users'))
+<a href="{{ route('users.index') }}"
+   class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+    <i class="bi bi-person-gear"></i> Users
+</a>
+@endif
+
+        <a href="{{ route('salespeople.index') }}"
+   class="nav-link {{ request()->routeIs('salespeople.*') ? 'active' : '' }}">
+    <i class="bi bi-person-badge"></i> Salespeople
+</a>
+{{-- Commission Tiers — admin only --}}
+@if(userCan('edit_commission_tiers'))
+<a href="{{ route('commission-tiers.index') }}"
+   class="nav-link {{ request()->routeIs('commission-tiers.*') ? 'active' : '' }}">
+    <i class="bi bi-sliders"></i> Commission Tiers
+</a>
+@endif
+
+        {{-- SMS Recipients — admin only --}}
+@if(userCan('manage_sms_recipients'))
+<a href="{{ route('sms-recipients.index') }}"
+   class="nav-link {{ request()->routeIs('sms-recipients.*') ? 'active' : '' }}">
+    <i class="bi bi-phone"></i> SMS Recipients
+</a>
+@endif
+{{-- Action Log — admin only --}}
+@if(userCan('view_action_log'))
+<a href="{{ route('action-log.index') }}"
+   class="nav-link {{ request()->routeIs('action-log.*') ? 'active' : '' }}">
+    <i class="bi bi-clock-history"></i> Action Log
+</a>
+@endif
+{{-- Reports --}}
+@if(userCan('view_reports'))
+<a href="{{ route('reports.index') }}"
+   class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+    <i class="bi bi-bar-chart"></i> Reports
+</a>
+@endif
     </nav>
 </div>
 

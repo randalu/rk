@@ -8,6 +8,7 @@ body {
 
 .sidebar {
     min-height: 100vh;
+    height: 100vh;
     width: 250px;
     background-color: #1a1f36;
     position: fixed;
@@ -15,6 +16,23 @@ body {
     left: 0;
     z-index: 100;
     transition: all 0.3s;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #2d3561 #1a1f36;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: #1a1f36;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #2d3561;
+    border-radius: 4px;
 }
 
 .sidebar .nav-link {

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\SmsService;
 
 class BillController extends Controller
 {
@@ -52,6 +53,10 @@ class BillController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            // Fire new bill SMS
+$smsService = new SmsService();
+$bill->load('customer', 'salesperson', 'payments');
+$smsService->newBillSms($bill);
 
             // Calculate due date from payment term
             $dueDate = match($request->payment_term) {
@@ -91,6 +96,12 @@ class BillController extends Controller
                 // Deduct from inventory
                 $inventoryItem->decrement('qty', $item['qty']);
             }
+            // Check low stock after deduction
+$inventoryItem->refresh();
+if ($inventoryItem->isLowStock()) {
+    $smsService = new SmsService();
+    $smsService->lowStockSms($inventoryItem);
+}
 
             // Create commission record
             $this->createCommission($bill, $total);

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class SmsLog extends Model
 {
+    protected $table = 'sms_log'; // add this line
+    
     protected $fillable = [
         'recipient_phone',
         'recipient_type',
