@@ -49,13 +49,24 @@
             text-decoration: none;
         }
 
-        /* Header */
         .invoice-header {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 14px;
             padding-bottom: 10px;
             border-bottom: 2px solid #4f46e5;
+        }
+
+        .logo-box {
+            width: 64px;
+            vertical-align: top;
+            padding-right: 10px;
+        }
+
+        .logo-box img {
+            width: 56px;
+            height: auto;
+            display: block;
         }
 
         .company-name {
@@ -68,6 +79,13 @@
             font-size: 9px;
             color: #888;
             margin-top: 2px;
+        }
+
+        .company-detail {
+            font-size: 8px;
+            color: #555;
+            line-height: 1.6;
+            margin-top: 3px;
         }
 
         .invoice-label {
@@ -105,7 +123,6 @@
         .status-unpaid  { background: #fef3c7; color: #92400e; }
         .status-overdue { background: #fee2e2; color: #991b1b; }
 
-        /* Items Table */
         .items-table {
             width: 100%;
             border-collapse: collapse;
@@ -160,33 +177,6 @@
             font-weight: 600;
         }
 
-        /* Totals */
-        .totals-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            font-size: 10px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .totals-row:last-child { border-bottom: none; }
-
-        .totals-row.grand {
-            font-size: 12px;
-            font-weight: 700;
-            color: #4f46e5;
-            border-top: 2px solid #4f46e5;
-            padding-top: 6px;
-            margin-top: 2px;
-        }
-
-        .totals-row .lbl  { color: #666; }
-        .totals-row .val  { font-weight: 600; }
-        .totals-row.grand .val   { color: #4f46e5; }
-        .totals-row.paid .val    { color: #059669; }
-        .totals-row.balance .val { color: #dc2626; }
-
-        /* Payment History */
         .section-title {
             font-size: 8px;
             font-weight: 700;
@@ -222,14 +212,18 @@
             color: #444;
         }
 
-        /* Footer */
         .invoice-footer {
             text-align: center;
             padding-top: 10px;
             border-top: 1px solid #e8e8f5;
-            color: #aaa;
+            color: #888;
             font-size: 9px;
             line-height: 1.6;
+        }
+
+        .footer-notes {
+            margin-top: 6px;
+            white-space: pre-line;
         }
 
         @media print {
@@ -241,48 +235,85 @@
 <body>
 
 @php
-    $paid        = $bill->payments->sum('amount');
-    $balance     = $bill->total - $paid;
+    $paid = $bill->payments->sum('amount');
+    $balance = $bill->total - $paid;
     $isFullyPaid = $balance <= 0;
-    $isOverdue   = !$isFullyPaid && $bill->due_date && $bill->due_date->isPast();
+    $isOverdue = !$isFullyPaid && $bill->due_date && $bill->due_date->isPast();
+    $isPdf = $isPdf ?? false;
 
     $termLabels = [
-        'cash'      => 'Cash',
+        'cash' => 'Cash',
         'credit_30' => 'Credit 30 Days',
         'credit_45' => 'Credit 45 Days',
         'credit_60' => 'Credit 60 Days',
     ];
 
-    $isPdf = $isPdf ?? false;
+    $systemName = systemSetting('system_name', config('app.name'));
+    $companyName = systemSetting('company_name', $systemName);
+    $companyTagline = systemSetting('company_tagline');
+    $companyPhone = systemSetting('company_phone');
+    $companyEmail = systemSetting('company_email');
+    $companyWebsite = systemSetting('company_website');
+    $companyAddress = systemSetting('company_address');
+    $companyRegistrationNo = systemSetting('company_registration_no');
+    $footerHeading = systemSetting('invoice_footer_heading', 'Thank you for your business');
+    $footerNotes = systemSetting('invoice_footer_notes');
+    $logoSource = $isPdf ? systemLogoPath() : systemLogoUrl();
+    $hasLogo = $logoSource && (!$isPdf || file_exists($logoSource));
 @endphp
 
 <div class="invoice-wrapper">
-
-    {{-- Print Bar — hidden in PDF --}}
     @if(!$isPdf)
     <div class="print-bar">
-        <a href="{{ route('bills.show', $bill) }}" class="btn-back">← Back</a>
-        <a href="{{ route('bills.pdf', $bill) }}" class="btn-print">⬇ PDF</a>
-        <button onclick="window.print()" class="btn-print">🖨 Print</button>
+        <a href="{{ route('bills.show', $bill) }}" class="btn-back">Back</a>
+        <a href="{{ route('bills.pdf', $bill) }}" class="btn-print">PDF</a>
+        <button onclick="window.print()" class="btn-print">Print</button>
     </div>
     @endif
 
-    {{-- Header --}}
-    <table style="width:100%; border-collapse:collapse; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #4f46e5;">
+    <table class="invoice-header">
         <tr>
-            <td style="vertical-align:top;">
-                <div class="company-name">{{ config('app.name') }}</div>
-                <div class="company-tagline">Medical Sales &amp; Distribution</div>
+            <td style="vertical-align:top; width:68%;">
+                <table style="border-collapse:collapse; width:100%;">
+                    <tr>
+                        @if($hasLogo)
+                        <td class="logo-box">
+                            <img src="{{ $logoSource }}" alt="Company logo">
+                        </td>
+                        @endif
+                        <td style="vertical-align:top;">
+                            <div class="company-name">{{ $companyName }}</div>
+                            @if($companyTagline)
+                            <div class="company-tagline">{{ $companyTagline }}</div>
+                            @endif
+                            @if($companyPhone)
+                            <div class="company-detail">Phone: {{ $companyPhone }}</div>
+                            @endif
+                            @if($companyEmail)
+                            <div class="company-detail">Email: {{ $companyEmail }}</div>
+                            @endif
+                            @if($companyWebsite)
+                            <div class="company-detail">Web: {{ $companyWebsite }}</div>
+                            @endif
+                            @if($companyRegistrationNo)
+                            <div class="company-detail">Reg No: {{ $companyRegistrationNo }}</div>
+                            @endif
+                            @if($companyAddress)
+                            <div class="company-detail">{!! nl2br(e($companyAddress)) !!}</div>
+                            @endif
+                        </td>
+                    </tr>
+                </table>
             </td>
-            <td style="text-align:right; vertical-align:top;">
+            <td style="text-align:right; vertical-align:top; width:32%;">
                 <div class="invoice-label">INVOICE</div>
                 <div class="invoice-number">#{{ str_pad($bill->id, 5, '0', STR_PAD_LEFT) }}</div>
                 <div class="invoice-date">{{ $bill->created_at->format('d F Y') }}</div>
                 <div>
                     @if($isFullyPaid)
-                        <span class="status-badge status-paid">✓ Paid</span>
+                        <span class="status-badge status-paid">Paid</span>
                     @elseif($isOverdue)
-                        <span class="status-badge status-overdue">⚠ Overdue</span>
+                        <span class="status-badge status-overdue">Overdue</span>
                     @else
                         <span class="status-badge status-unpaid">Pending</span>
                     @endif
@@ -291,7 +322,6 @@
         </tr>
     </table>
 
-    {{-- Info Grid — table layout for dompdf compatibility --}}
     <table style="width:100%; border-collapse:separate; border-spacing:8px 0; margin-bottom:14px;">
         <tr>
             <td style="width:50%; vertical-align:top; background:#f8f8ff; border:1px solid #e8e8f5; border-radius:5px; padding:8px 10px;">
@@ -301,19 +331,19 @@
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
                         <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Customer</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->name ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Phone</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->phone ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->phone ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Email</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->email ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->email ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Address</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->address ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->address ?? '-' }}</td>
                     </tr>
                 </table>
             </td>
@@ -329,12 +359,12 @@
                     <tr>
                         <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Due Date</td>
                         <td style="font-size:9px; font-weight:600; padding:2px 0; color:{{ $isOverdue ? '#dc2626' : '#1a1a2e' }};">
-                            {{ $bill->due_date?->format('d M Y') ?? '—' }}
+                            {{ $bill->due_date?->format('d M Y') ?? '-' }}
                         </td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Payment Term</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $termLabels[$bill->payment_term] }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $termLabels[$bill->payment_term] ?? ucfirst($bill->payment_term) }}</td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Payment Type</td>
@@ -342,18 +372,17 @@
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Salesperson</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->salesperson?->name ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->salesperson?->name ?? '-' }}</td>
                     </tr>
                     <tr>
                         <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Prepared By</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->createdBy?->name ?? '—' }}</td>
+                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->createdBy?->name ?? '-' }}</td>
                     </tr>
                 </table>
             </td>
         </tr>
     </table>
 
-    {{-- Items Table --}}
     <table class="items-table">
         <thead>
             <tr>
@@ -369,8 +398,8 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>
-                    <div class="product-name">{{ $item->inventory?->name ?? '—' }}</div>
-                    @if($item->batch_number && $item->batch_number !== '—')
+                    <div class="product-name">{{ $item->inventory?->name ?? '-' }}</div>
+                    @if($item->batch_number && $item->batch_number !== '-')
                         <span class="batch-tag">Batch: {{ $item->batch_number }}</span>
                     @endif
                 </td>
@@ -382,7 +411,6 @@
         </tbody>
     </table>
 
-    {{-- Totals --}}
     <table style="width:100%; border-collapse:collapse; margin-bottom:12px;">
         <tr>
             <td style="width:55%;"></td>
@@ -425,7 +453,6 @@
         </tr>
     </table>
 
-    {{-- Payment History --}}
     @if($bill->payments->count() > 0)
     <div class="section-title">Payment History</div>
     <table class="payments-table">
@@ -446,17 +473,18 @@
                     {{ config('app.currency') }} {{ number_format($payment->amount, 2) }}
                 </td>
                 <td>{{ ucfirst($payment->payment_type) }}</td>
-                <td>{{ $payment->receivedBy?->name ?? '—' }}</td>
-                <td>{{ $payment->notes ?? '—' }}</td>
+                <td>{{ $payment->receivedBy?->name ?? '-' }}</td>
+                <td>{{ $payment->notes ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
     @endif
 
-    {{-- Footer --}}
     <div class="invoice-footer">
-        <p>Thank you for your business &mdash; {{ config('app.name') }}</p>
+        @if($footerHeading)
+        <p>{{ $footerHeading }} - {{ $companyName }}</p>
+        @endif
         <p>Generated on {{ now()->format('d M Y H:i') }}</p>
         @if($balance > 0)
         <p style="margin-top:5px; color:#dc2626; font-weight:700; font-size:9px;">
@@ -464,8 +492,10 @@
             due by {{ $bill->due_date?->format('d M Y') ?? 'due date' }}.
         </p>
         @endif
+        @if($footerNotes)
+        <p class="footer-notes">{{ $footerNotes }}</p>
+        @endif
     </div>
-
 </div>
 </body>
 </html>

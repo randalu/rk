@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Raphakallos') }} — @yield('title', 'Dashboard')</title>
+    <title>{{ systemSetting('system_name', config('app.name', 'Raphakallos')) }} - @yield('title', 'Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -15,9 +15,15 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-brand d-flex justify-content-between align-items-center">
-        <span>
-            <i class="bi bi-heart-pulse-fill text-danger me-1"></i>
-            Raphakallos
+        <span class="d-flex align-items-center gap-2">
+            @if(systemLogoUrl())
+            <img src="{{ systemLogoUrl() }}"
+                 alt="Logo"
+                 style="height:28px; width:auto; border-radius:6px; background:#fff; padding:2px;">
+            @else
+            <i class="bi bi-heart-pulse-fill text-danger"></i>
+            @endif
+            <span>{{ systemSetting('system_name', 'Raphakallos') }}</span>
         </span>
         <button onclick="toggleSidebar()"
                 class="d-md-none btn btn-sm text-white border-0 p-0">
@@ -96,6 +102,10 @@
            class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
             <i class="bi bi-person-gear"></i> Users
         </a>
+        <a href="{{ route('system-settings.edit') }}"
+           class="nav-link {{ request()->routeIs('system-settings.*') ? 'active' : '' }}">
+            <i class="bi bi-building-gear"></i> System Settings
+        </a>
         @endif
         <a href="{{ route('salespeople.index') }}"
            class="nav-link {{ request()->routeIs('salespeople.*') ? 'active' : '' }}">
@@ -125,7 +135,6 @@
 <div class="main-content" id="main-content">
     <div class="topbar">
         <div class="d-flex align-items-center gap-3">
-            {{-- Mobile menu toggle --}}
             <button class="d-md-none btn btn-sm btn-outline-secondary"
                     onclick="toggleSidebar()">
                 <i class="bi bi-list fs-5"></i>
@@ -134,7 +143,7 @@
                 @yield('title', 'Dashboard')
             </span>
             <span class="fw-semibold text-muted d-md-none">
-                Raphakallos
+                {{ systemSetting('system_name', 'Raphakallos') }}
             </span>
         </div>
         <div class="d-flex align-items-center gap-2">

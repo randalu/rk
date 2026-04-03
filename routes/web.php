@@ -18,6 +18,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SalespersonController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ActionLogController;
+use App\Http\Controllers\SystemSettingController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -73,6 +74,10 @@ Route::middleware(['auth'])->group(function () {
     // SMS Recipients
     Route::resource('sms-recipients', SmsRecipientController::class)
          ->only(['index', 'store', 'update', 'destroy']);
+
+    // System Settings
+    Route::get('settings/system', [SystemSettingController::class, 'edit'])->name('system-settings.edit');
+    Route::put('settings/system', [SystemSettingController::class, 'update'])->name('system-settings.update');
 
     // Users
     Route::resource('users', UserController::class);
