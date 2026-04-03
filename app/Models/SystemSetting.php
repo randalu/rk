@@ -18,5 +18,7 @@ class SystemSetting extends Model
         'company_registration_no',
         'invoice_footer_heading',
         'invoice_footer_notes',
+        'due_reminder_email_subject',
+        'due_reminder_email_body',
     ];
 }

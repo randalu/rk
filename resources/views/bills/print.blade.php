@@ -154,8 +154,8 @@
         }
 
         .items-table tbody td {
-            padding: 5px 8px;
-            font-size: 10px;
+            padding: 4px 8px;
+            font-size: 9px;
             color: #333;
             vertical-align: middle;
         }
@@ -167,14 +167,10 @@
             font-size: 10px;
         }
 
-        .batch-tag {
-            display: inline-block;
-            background: #ede9fe;
-            color: #5b21b6;
-            border-radius: 3px;
-            padding: 1px 4px;
+        .item-meta {
             font-size: 8px;
-            font-weight: 600;
+            color: #6b7280;
+            margin-top: 1px;
         }
 
         .section-title {
@@ -322,61 +318,61 @@
         </tr>
     </table>
 
-    <table style="width:100%; border-collapse:separate; border-spacing:8px 0; margin-bottom:14px;">
+    <table style="width:100%; border-collapse:separate; border-spacing:6px 0; margin-bottom:12px;">
         <tr>
-            <td style="width:50%; vertical-align:top; background:#f8f8ff; border:1px solid #e8e8f5; border-radius:5px; padding:8px 10px;">
-                <div style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#4f46e5; margin-bottom:6px; border-bottom:1px solid #e8e8f5; padding-bottom:4px;">
+            <td style="width:50%; vertical-align:top; background:#f8f8ff; border:1px solid #e8e8f5; border-radius:5px; padding:6px 8px;">
+                <div style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#4f46e5; margin-bottom:4px; border-bottom:1px solid #e8e8f5; padding-bottom:3px;">
                     Bill To
                 </div>
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Customer</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->name ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:68px; padding:1px 0;">Customer</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->customer?->name ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Phone</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->phone ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:68px; padding:1px 0;">Phone</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->customer?->phone ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Email</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->email ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:68px; padding:1px 0;">Email</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->customer?->email ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:76px; padding:2px 0;">Address</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->customer?->address ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:68px; padding:1px 0;">Address</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->customer?->address ?? '-' }}</td>
                     </tr>
                 </table>
             </td>
-            <td style="width:50%; vertical-align:top; background:#f8f8ff; border:1px solid #e8e8f5; border-radius:5px; padding:8px 10px;">
-                <div style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#4f46e5; margin-bottom:6px; border-bottom:1px solid #e8e8f5; padding-bottom:4px;">
+            <td style="width:50%; vertical-align:top; background:#f8f8ff; border:1px solid #e8e8f5; border-radius:5px; padding:6px 8px;">
+                <div style="font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#4f46e5; margin-bottom:4px; border-bottom:1px solid #e8e8f5; padding-bottom:3px;">
                     Invoice Details
                 </div>
                 <table style="width:100%; border-collapse:collapse;">
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Invoice Date</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->created_at->format('d M Y') }}</td>
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Invoice Date</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->created_at->format('d M Y') }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Due Date</td>
-                        <td style="font-size:9px; font-weight:600; padding:2px 0; color:{{ $isOverdue ? '#dc2626' : '#1a1a2e' }};">
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Due Date</td>
+                        <td style="font-size:8px; font-weight:600; padding:1px 0; color:{{ $isOverdue ? '#dc2626' : '#1a1a2e' }};">
                             {{ $bill->due_date?->format('d M Y') ?? '-' }}
                         </td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Payment Term</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $termLabels[$bill->payment_term] ?? ucfirst($bill->payment_term) }}</td>
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Payment Term</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $termLabels[$bill->payment_term] ?? ucfirst($bill->payment_term) }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Payment Type</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ ucfirst($bill->payment_type) }}</td>
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Payment Type</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ ucfirst($bill->payment_type) }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Salesperson</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->salesperson?->name ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Salesperson</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->salesperson?->name ?? '-' }}</td>
                     </tr>
                     <tr>
-                        <td style="font-size:9px; color:#888; width:84px; padding:2px 0;">Prepared By</td>
-                        <td style="font-size:9px; color:#1a1a2e; font-weight:600; padding:2px 0;">{{ $bill->createdBy?->name ?? '-' }}</td>
+                        <td style="font-size:8px; color:#888; width:76px; padding:1px 0;">Prepared By</td>
+                        <td style="font-size:8px; color:#1a1a2e; font-weight:600; padding:1px 0;">{{ $bill->createdBy?->name ?? '-' }}</td>
                     </tr>
                 </table>
             </td>
@@ -399,9 +395,10 @@
                 <td>{{ $index + 1 }}</td>
                 <td>
                     <div class="product-name">{{ $item->inventory?->name ?? '-' }}</div>
-                    @if($item->batch_number && $item->batch_number !== '-')
-                        <span class="batch-tag">Batch: {{ $item->batch_number }}</span>
-                    @endif
+                    <div class="item-meta">
+                        Batch: {{ $item->batch_number && $item->batch_number !== '-' ? $item->batch_number : 'N/A' }}
+                        | Exp: {{ $item->inventory?->expiry_date?->format('M Y') ?? 'N/A' }}
+                    </div>
                 </td>
                 <td class="right">{{ $item->qty }}</td>
                 <td class="right">{{ config('app.currency') }} {{ number_format($item->unit_price, 2) }}</td>

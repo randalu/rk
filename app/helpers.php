@@ -77,3 +77,18 @@ if (!function_exists('systemLogoPath')) {
         return $path ? public_path(str_replace('/', DIRECTORY_SEPARATOR, ltrim($path, '/'))) : null;
     }
 }
+
+if (!function_exists('systemTemplateRender')) {
+    function systemTemplateRender(?string $template, array $variables = []): string
+    {
+        $template ??= '';
+
+        $replacements = [];
+
+        foreach ($variables as $key => $value) {
+            $replacements['{' . $key . '}'] = (string) $value;
+        }
+
+        return strtr($template, $replacements);
+    }
+}

@@ -35,6 +35,8 @@ class SystemSettingController extends Controller
             'company_registration_no' => 'nullable|string|max:255',
             'invoice_footer_heading' => 'nullable|string|max:255',
             'invoice_footer_notes' => 'nullable|string|max:2000',
+            'due_reminder_email_subject' => 'nullable|string|max:255',
+            'due_reminder_email_body' => 'nullable|string|max:5000',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -79,6 +81,8 @@ class SystemSettingController extends Controller
             'company_tagline' => 'Medical Sales & Distribution',
             'invoice_footer_heading' => 'Thank you for your business',
             'invoice_footer_notes' => null,
+            'due_reminder_email_subject' => 'Reminder: Invoice #{invoice_number} due on {due_date}',
+            'due_reminder_email_body' => "Dear {customer_name},\n\nThis is a reminder that invoice #{invoice_number} has an outstanding balance of {currency} {balance} and is due on {due_date}.\n\nPlease find the invoice PDF attached for your reference.\n\nThank you,\n{company_name}",
         ];
     }
 }

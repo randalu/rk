@@ -32,7 +32,8 @@
                     <li class="mb-2">Sidebar branding and system name</li>
                     <li class="mb-2">Invoice/PDF header logo and company details</li>
                     <li class="mb-2">Editable footer heading and notes</li>
-                    <li>Business contact information shown on invoices</li>
+                    <li class="mb-2">Business contact information shown on invoices</li>
+                    <li>Editable due reminder email subject/body templates</li>
                 </ul>
             </div>
         </div>
@@ -144,7 +145,7 @@
                     </div>
 
                     <h6 class="fw-semibold border-bottom pb-2 mb-3">Invoice Footer</h6>
-                    <div class="row g-3">
+                    <div class="row g-3 mb-4">
                         <div class="col-12">
                             <label class="form-label fw-semibold">Footer Heading</label>
                             <input type="text" name="invoice_footer_heading"
@@ -163,6 +164,32 @@
                                       placeholder="Bank details, payment instructions, return policy, etc.">{{ old('invoice_footer_notes', $settings->invoice_footer_notes) }}</textarea>
                             <div class="form-text">The outstanding balance line will appear before these notes.</div>
                             @error('invoice_footer_notes')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <h6 class="fw-semibold border-bottom pb-2 mb-3">Due Reminder Email</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Email Subject Template</label>
+                            <input type="text" name="due_reminder_email_subject"
+                                   class="form-control @error('due_reminder_email_subject') is-invalid @enderror"
+                                   value="{{ old('due_reminder_email_subject', $settings->due_reminder_email_subject) }}"
+                                   placeholder="Reminder: Invoice #{invoice_number} due on {due_date}">
+                            <div class="form-text">Available placeholders: <code>{customer_name}</code>, <code>{invoice_number}</code>, <code>{balance}</code>, <code>{due_date}</code>, <code>{company_name}</code>, <code>{currency}</code>.</div>
+                            @error('due_reminder_email_subject')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Email Body Template</label>
+                            <textarea name="due_reminder_email_body"
+                                      rows="8"
+                                      class="form-control @error('due_reminder_email_body') is-invalid @enderror"
+                                      placeholder="Dear {customer_name}, ...">{{ old('due_reminder_email_body', $settings->due_reminder_email_body) }}</textarea>
+                            <div class="form-text">The invoice PDF will be attached automatically to the reminder email.</div>
+                            @error('due_reminder_email_body')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
